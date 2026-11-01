@@ -1,3 +1,4 @@
+import { validator } from "@grocery-split/validation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { parseResponse } from "hono/client";
 import { useNavigate } from "react-router";
@@ -21,6 +22,7 @@ function CreateGroup() {
 			label="Group name"
 			placeholder="Apartment 4B"
 			description="You can invite roommates right after it's created."
+			schema={validator.group}
 			onCreate={mutation.mutate}
 			isPending={mutation.isPending}
 			createError={mutation.error ? errorMessage(mutation.error) : undefined}

@@ -1,3 +1,4 @@
+import { validator } from "@grocery-split/validation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { parseResponse } from "hono/client";
 import { useNavigate, useParams } from "react-router";
@@ -26,6 +27,7 @@ function CreateTrip() {
 			label="Trip name"
 			placeholder="Trader Joe's"
 			description={`Tip: name it after the store — the date is added for you (${date}).`}
+			schema={validator.trip}
 			onCreate={mutation.mutate}
 			isPending={mutation.isPending}
 			createError={mutation.error ? errorMessage(mutation.error) : undefined}
