@@ -17,7 +17,7 @@ export const item = snakeCase.table(
 		quantity: text(),
 		notes: text(),
 		price: real(), // CAN BE NULL if the price is not known yet
-		createdAt: integer({ mode: "timestamp_ms" })
+		createdAt: integer()
 			.notNull()
 			.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`),
 		createdById: text()

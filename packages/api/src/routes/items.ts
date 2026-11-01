@@ -2,8 +2,13 @@ import { Hono } from "hono";
 import type { AppEnv } from "../index.ts";
 import { db } from "../lib/db.ts";
 import { schema } from "@grocery-split/db";
-import { validator, type Item, type WantedItem } from "@grocery-split/validation";
-import { eq, and, isNull } from "drizzle-orm";
+import {
+	validator,
+	type Item,
+	type PopulatedItem,
+	type WantedItem
+} from "@grocery-split/validation";
+import { eq, and } from "drizzle-orm";
 import { zValidator } from "../middleware/zValidator.ts";
 import { validateGroupAndItemParam, validateGroupParam } from "../middleware/validateParams.ts";
 import { firstOrNotFound } from "../lib/firstOrNotFound.ts";
@@ -41,23 +46,38 @@ const items = new Hono<AppEnv<true>>()
 
 		await validateTripId(c.var.groupId, tripId);
 
-		const res = await db
-			.select()
-			.from(schema.item)
-			.where(
-				and(
-					eq(schema.item.groupId, c.var.groupId),
-					tripId !== undefined ? eq(schema.item.tripId, tripId) : isNull(schema.item.tripId)
-				)
-			);
+		const res = await db.query.item.findMany({
+			with: {
+				wantedBy: {
+					with: {
+						user: true
+					}
+				}
+			},
+			where: {
+				groupId: c.var.groupId,
+				tripId: tripId !== undefined ? tripId : { isNull: true }
+			}
+		});
 
-		return c.json(res as Item[]);
+		return c.json(res as PopulatedItem[]);
 	})
 
 	.get("/:itemId", validateGroupAndItemParam, async (c) => {
-		const res = await db.select().from(schema.item).where(eq(schema.item.id, c.var.itemId));
+		const res = await db.query.item.findMany({
+			with: {
+				wantedBy: {
+					with: {
+						user: true
+					}
+				}
+			},
+			where: {
+				id: c.var.itemId
+			}
+		});
 
-		return c.json(firstOrNotFound(res, "Item Not Found") as Item);
+		return c.json(firstOrNotFound(res, "Item Not Found") as PopulatedItem);
 	})
 
 	// Get the members sharing an item and their relative number of parts.

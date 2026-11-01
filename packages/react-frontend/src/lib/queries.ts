@@ -29,7 +29,15 @@ export const tripsQuery = (groupId: string) =>
 		queryFn: () => parseResponse(group.trips.$get({ param: { groupId } }))
 	});
 
-export const tripItemsQuery = (groupId: string, tripId: string) =>
+export const tripQuery = (groupId: string, tripId?: string) =>
+	queryOptions({
+		queryKey: ["groups", groupId, "trips", tripId],
+		enabled: tripId !== undefined,
+		queryFn: () =>
+			parseResponse(group.trips[":tripId"].$get({ param: { groupId, tripId: tripId! } }))
+	});
+
+export const itemsQuery = (groupId: string, tripId?: string) =>
 	queryOptions({
 		queryKey: ["groups", groupId, "trips", tripId, "items"],
 		queryFn: () => parseResponse(group.items.$get({ param: { groupId }, query: { tripId } }))

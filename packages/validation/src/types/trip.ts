@@ -6,6 +6,6 @@ export interface Trip {
 	id: ID;
 	name: string;
 	groupId: Group["id"];
-	createdAt: Date;
+	createdAt: number;
 	createdById: User["id"];
 }

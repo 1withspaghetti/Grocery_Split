@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarGroup } from "@/components/ui/avatar";
+import { AvatarGroup, UserAvatar } from "@/components/ui/avatar";
 import { Link } from "react-router";
 import { ChevronRight, Users } from "lucide-react";
 import AddButton from "@/components/AddButton";
 import { authClient } from "@/lib/client";
 import { errorMessage, groupsQuery, membersQuery } from "@/lib/queries";
-import { initials } from "@/lib/utils";
+import type { User } from "@grocery-split/validation";
 
 function GroupCard({ group }: { group: { id: string; name: string } }) {
 	const { data: members } = useQuery(membersQuery(group.id));
@@ -26,9 +26,7 @@ function GroupCard({ group }: { group: { id: string; name: string } }) {
 						</h2>
 						<AvatarGroup className="mt-2">
 							{members?.map((member) => (
-								<Avatar key={member.id} size="sm" className="bg-muted" title={member.name}>
-									<AvatarFallback>{initials(member.name)}</AvatarFallback>
-								</Avatar>
+								<UserAvatar key={member.id} user={member} size="sm" />
 							))}
 						</AvatarGroup>
 					</div>
@@ -47,11 +45,7 @@ function MyGroups() {
 		<main className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col gap-5 bg-background p-4 sm:gap-6 sm:p-6 lg:p-8">
 			<header className="flex items-center justify-between gap-4">
 				<h1 className="font-heading text-xl font-bold sm:text-2xl">My Groups</h1>
-				<Avatar className="size-12 bg-muted" title={session?.user.name}>
-					<AvatarFallback className="text-lg">
-						{session ? initials(session.user.name) : ""}
-					</AvatarFallback>
-				</Avatar>
+				{session && <UserAvatar user={session.user as User} />}
 			</header>
 
 			<section aria-label="Your groups" className="grid grid-cols-1 gap-3 sm:gap-4">

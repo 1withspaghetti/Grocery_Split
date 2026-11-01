@@ -19,7 +19,7 @@ export const membership = snakeCase.table(
 		groupId: text()
 			.notNull()
 			.references(() => group.id, { onDelete: "cascade" }),
-		createdAt: integer({ mode: "timestamp_ms" })
+		createdAt: integer()
 			.notNull()
 			.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
 	},
@@ -37,8 +37,8 @@ export const invite = snakeCase.table(
 		groupId: text()
 			.notNull()
 			.references(() => group.id, { onDelete: "cascade" }),
-		expires: integer({ mode: "timestamp_ms" }).notNull(),
-		createdAt: integer({ mode: "timestamp_ms" })
+		expires: integer().notNull(),
+		createdAt: integer()
 			.notNull()
 			.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`),
 		createdById: text()

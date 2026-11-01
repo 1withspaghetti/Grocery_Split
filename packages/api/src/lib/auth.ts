@@ -3,6 +3,7 @@ import { drizzleAdapter } from "@better-auth/drizzle-adapter/relations-v2";
 import { env } from "cloudflare:workers";
 import { db } from "./db.ts";
 import { schema } from "@grocery-split/db";
+import { nanoid } from "./nanoid.ts";
 
 export const auth = betterAuth({
 	appName: "Grocery Split",
@@ -17,6 +18,12 @@ export const auth = betterAuth({
 		google: {
 			clientId: env.GOOGLE_CLIENT_ID,
 			clientSecret: env.GOOGLE_CLIENT_SECRET
+		}
+	},
+	advanced: {
+		database: {
+			generateId: () => nanoid(),
+			joins: true
 		}
 	}
 });

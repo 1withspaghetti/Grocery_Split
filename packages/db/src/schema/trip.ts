@@ -11,7 +11,7 @@ export const trip = snakeCase.table(
 		groupId: text()
 			.notNull()
 			.references(() => group.id, { onDelete: "cascade" }),
-		createdAt: integer({ mode: "timestamp_ms" })
+		createdAt: integer()
 			.notNull()
 			.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`),
 		createdById: text()

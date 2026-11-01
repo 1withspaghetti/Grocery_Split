@@ -11,5 +11,8 @@ export const client = hc<AppType>(import.meta.env.VITE_API_BASE, {
 
 export const authClient = createAuthClient({
 	baseURL: import.meta.env.VITE_API_BASE,
-	basePath: "/api/auth"
+	basePath: "/api/auth",
+	fetchOptions: {
+		credentials: "include"
+	}
 });

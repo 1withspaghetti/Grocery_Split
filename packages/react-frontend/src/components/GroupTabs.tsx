@@ -1,7 +1,6 @@
 import { generatePath, Link, NavLink, Outlet, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ListChecks, Settings, ShoppingCart, UserPlus, Wallet } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarGroup } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -12,8 +11,8 @@ import {
 	DialogTrigger
 } from "@/components/ui/dialog";
 import { usePageHandle } from "@/components/AppLayout";
-import { groupQuery, membersQuery } from "@/lib/queries";
-import { cn, initials } from "@/lib/utils";
+import { groupQuery } from "@/lib/queries";
+import { cn } from "@/lib/utils";
 
 const tabs = [
 	{ label: "Trips", path: "/groups/:groupId/trips", icon: ShoppingCart },
@@ -26,7 +25,6 @@ function GroupTabs() {
 	const page = usePageHandle();
 	const groupId = params.groupId ?? "";
 	const { data: group, isPending } = useQuery(groupQuery(groupId));
-	const { data: members } = useQuery(membersQuery(groupId));
 
 	if (isPending) {
 		return (
@@ -90,13 +88,6 @@ function GroupTabs() {
 						<Settings aria-hidden="true" className="size-5" />
 					</Button>
 				</div>
-				<AvatarGroup className="justify-center" aria-label="Group members">
-					{members?.map((member) => (
-						<Avatar key={member.id} size="sm" title={member.name}>
-							<AvatarFallback>{initials(member.name)}</AvatarFallback>
-						</Avatar>
-					))}
-				</AvatarGroup>
 			</header>
 
 			<div className="flex flex-1 flex-col gap-5 sm:gap-6">

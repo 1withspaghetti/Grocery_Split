@@ -11,12 +11,20 @@ export interface Item {
 	quantity: string | null;
 	notes: string | null;
 	price: number | null;
-	createdAt: Date;
+	createdAt: number;
 	createdById: User["id"];
+}
+
+export interface PopulatedItem extends Item {
+	wantedBy: PopulatedWantedItem[];
 }
 
 export interface WantedItem {
 	itemId: Item["id"];
 	userId: User["id"];
 	parts: number;
+}
+
+export interface PopulatedWantedItem extends WantedItem {
+	user: User;
 }

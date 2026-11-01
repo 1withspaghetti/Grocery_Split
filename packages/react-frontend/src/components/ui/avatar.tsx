@@ -1,6 +1,23 @@
 import * as React from "react";
 import { Avatar as AvatarPrimitive } from "@base-ui/react/avatar";
 import { cn } from "cn";
+import type { User } from "@grocery-split/validation";
+import { initials } from "@/lib/utils";
+
+function UserAvatar({
+	user,
+	...props
+}: AvatarPrimitive.Root.Props & {
+	size?: "default" | "sm" | "lg";
+	user: User;
+}) {
+	return (
+		<Avatar title={user.name} {...props}>
+			{user.image && <AvatarImage src={user.image} alt={user.name} />}
+			<AvatarFallback>{initials(user.name)}</AvatarFallback>
+		</Avatar>
+	);
+}
 
 function Avatar({
 	className,
@@ -87,4 +104,12 @@ function AvatarGroupCount({ className, ...props }: React.ComponentProps<"div">) 
 	);
 }
 
-export { Avatar, AvatarImage, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarBadge };
+export {
+	UserAvatar,
+	Avatar,
+	AvatarImage,
+	AvatarFallback,
+	AvatarGroup,
+	AvatarGroupCount,
+	AvatarBadge
+};

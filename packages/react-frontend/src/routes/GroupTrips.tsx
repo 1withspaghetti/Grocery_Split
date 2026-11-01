@@ -2,17 +2,18 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router";
 import { ShoppingCart } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { errorMessage, tripItemsQuery, tripsQuery } from "@/lib/queries";
+import { errorMessage, itemsQuery, tripsQuery } from "@/lib/queries";
 import { cn, formatPrice } from "@/lib/utils";
 import AddButton from "@/components/AddButton";
+import type { Trip } from "@grocery-split/validation";
 
 interface TripCardProps {
 	groupId: string;
-	trip: { id: string; name: string; createdAt: string };
+	trip: Trip;
 }
 
 function TripCard({ groupId, trip }: TripCardProps) {
-	const { data: items } = useQuery(tripItemsQuery(groupId, trip.id));
+	const { data: items } = useQuery(itemsQuery(groupId, trip.id));
 	const pendingCount = items?.filter((item) => item.price === null).length ?? 0;
 	const total = items?.reduce((sum, item) => sum + (item.price ?? 0), 0) ?? 0;
 
@@ -38,7 +39,7 @@ function TripCard({ groupId, trip }: TripCardProps) {
 				<div>
 					<h2 className="font-heading text-lg font-semibold break-words">{trip.name}</h2>
 					<p className="mt-1 text-sm text-muted-foreground">
-						<time dateTime={trip.createdAt}>
+						<time dateTime={new Date(trip.createdAt).toString()}>
 							{new Date(trip.createdAt).toLocaleDateString("en-US", {
 								weekday: "short",
 								month: "short",
