@@ -1,4 +1,5 @@
 import { useId, useState, type FormEvent } from "react";
+import { validator, type Item, type User, type WantedItem } from "@grocery-split/validation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { parseResponse } from "hono/client";
 import { useNavigate, useParams } from "react-router";
@@ -9,17 +10,17 @@ import { client } from "@/lib/client";
 import { errorMessage, itemQuery, itemSharesQuery, membersQuery } from "@/lib/queries";
 import { cn, formatPrice, initials } from "@/lib/utils";
 
+// Friendlier wording for the fields people can actually get wrong
+const itemFieldErrors: Partial<Record<PropertyKey, string>> = {
+	name: "Enter a name to continue.",
+	price: "Enter a price between 0 and 99,999, or leave it empty if it's pending."
+};
+
 interface ItemFormProps {
-	members: { id: string; name: string }[];
+	members: Pick<User, "id" | "name">[];
 	// Only set when editing an existing item
-	item?: {
-		id: string;
-		name: string;
-		quantity: string | null;
-		notes: string | null;
-		price: number | null;
-	};
-	shares?: { userId: string; parts: number }[];
+	item?: Pick<Item, "id" | "name" | "quantity" | "notes" | "price">;
+	shares?: Pick<WantedItem, "userId" | "parts">[];
 }
 
 function ItemForm({ members, item, shares }: ItemFormProps) {
@@ -49,12 +50,20 @@ function ItemForm({ members, item, shares }: ItemFormProps) {
 	);
 
 	const priceValue = price.trim() === "" ? null : Number(price);
-	const priceIsValid =
-		priceValue === null || (Number.isFinite(priceValue) && priceValue >= 0 && priceValue <= 99_999);
+	const priceIsValid = validator.item.shape.price.safeParse(priceValue).success;
 	const totalParts = members.reduce(
 		(sum, member) => sum + (split[member.id].selected ? split[member.id].parts : 0),
 		0
 	);
+	const json = {
+		name: name.trim(),
+		quantity: quantity.trim() || null,
+		notes: item?.notes ?? null,
+		price: priceValue
+	};
+	const itemShares = members
+		.filter((member) => split[member.id].selected)
+		.map((member) => ({ userId: member.id, parts: split[member.id].parts }));
 
 	function finish() {
 		void navigate(back);
@@ -62,14 +71,8 @@ function ItemForm({ members, item, shares }: ItemFormProps) {
 	}
 
 	const save = useMutation({
-		mutationFn: async (priceToSave: number | null) => {
+		mutationFn: async () => {
 			const items = client.api.groups[":groupId"].items;
-			const json = {
-				name: name.trim(),
-				quantity: quantity.trim() || null,
-				notes: item?.notes ?? null,
-				price: priceToSave
-			};
 			const saved = await parseResponse(
 				item
 					? items[":itemId"].$patch({ param: { groupId, itemId: item.id }, json })
@@ -78,9 +81,7 @@ function ItemForm({ members, item, shares }: ItemFormProps) {
 			await parseResponse(
 				items[":itemId"].shares.$put({
 					param: { groupId, itemId: saved.id },
-					json: members
-						.filter((member) => split[member.id].selected)
-						.map((member) => ({ userId: member.id, parts: split[member.id].parts }))
+					json: itemShares
 				})
 			);
 		},
@@ -99,15 +100,15 @@ function ItemForm({ members, item, shares }: ItemFormProps) {
 
 	function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		if (!name.trim()) {
-			setError("Enter a name to continue.");
-		} else if (!priceIsValid) {
-			setError("Enter a price between 0 and 99,999, or leave it empty if it's pending.");
-		} else if (totalParts === 0) {
+		const result = validator.item.safeParse(json);
+		if (!result.success) {
+			const issue = result.error.issues[0];
+			setError(itemFieldErrors[issue.path[0]] ?? issue.message);
+		} else if (!validator.itemShares.safeParse(itemShares).success) {
 			setError("Pick at least one member to split with.");
 		} else {
 			setError("");
-			save.mutate(priceValue);
+			save.mutate();
 		}
 	}
 

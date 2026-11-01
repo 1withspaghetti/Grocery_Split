@@ -1,4 +1,5 @@
 import { useId, useState, type FormEvent } from "react";
+import { validator, type Group, type User } from "@grocery-split/validation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { parseResponse } from "hono/client";
 import { useParams } from "react-router";
@@ -11,8 +12,8 @@ import { errorMessage, groupQuery, groupsQuery, membersQuery } from "@/lib/queri
 import { cn, initials } from "@/lib/utils";
 
 interface GroupSettingsFormProps {
-	group: { id: string; name: string; ownerId: string };
-	members: { id: string; name: string }[];
+	group: Pick<Group, "id" | "name" | "ownerId">;
+	members: Pick<User, "id" | "name">[];
 }
 
 function GroupSettingsForm({ group, members }: GroupSettingsFormProps) {
@@ -50,16 +51,22 @@ function GroupSettingsForm({ group, members }: GroupSettingsFormProps) {
 
 	function handleRename(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		if (!name.trim()) {
+		const result = validator.group.safeParse({ name: name.trim() });
+		if (!result.success) {
 			setNameError("Enter a name to continue.");
 			return;
 		}
-		rename.mutate(name.trim());
+		rename.mutate(result.data.name);
 	}
 
 	function handleTransfer(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		transfer.mutate(newOwner);
+		const result = validator.groupOwner.safeParse({ ownerId: newOwner });
+		if (!result.success) {
+			setOwnerStatus("Pick a member to transfer ownership to.");
+			return;
+		}
+		transfer.mutate(result.data.ownerId);
 	}
 
 	return (

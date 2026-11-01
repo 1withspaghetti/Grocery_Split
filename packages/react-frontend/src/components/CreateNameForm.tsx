@@ -1,4 +1,5 @@
 import { useId, useState, type FormEvent } from "react";
+import type { validator } from "@grocery-split/validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -6,6 +7,7 @@ interface CreateNameFormProps {
 	label: string;
 	placeholder: string;
 	description: string;
+	schema: typeof validator.group | typeof validator.trip;
 	onCreate: (name: string) => void;
 	isPending: boolean;
 	// Message from the last failed create, if any
@@ -16,6 +18,7 @@ function CreateNameForm({
 	label,
 	placeholder,
 	description,
+	schema,
 	onCreate,
 	isPending,
 	createError
@@ -26,15 +29,16 @@ function CreateNameForm({
 
 	function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		if (!name.trim()) {
+		const result = schema.safeParse({ name: name.trim() });
+		if (!result.success) {
 			setError("Enter a name to continue.");
 			return;
 		}
-		onCreate(name.trim());
+		onCreate(result.data.name);
 	}
 
 	return (
-		<form className="flex flex-1 flex-col" onSubmit={handleSubmit}>
+		<form noValidate className="flex flex-1 flex-col" onSubmit={handleSubmit}>
 			<div className="flex min-h-72 flex-1 items-center px-6 py-12 sm:px-6 lg:px-8">
 				<div className="mx-auto w-full max-w-xl">
 					<label htmlFor={inputId} className="mb-2 block text-sm font-semibold">
