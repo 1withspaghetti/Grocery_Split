@@ -4,22 +4,18 @@ import { Card } from "@/components/ui/card";
 import AddButton from "@/components/AddButton";
 import { useQuery } from "@tanstack/react-query";
 import ShoppingList from "@/components/ShoppingList";
-import { itemsQuery, tripQuery } from "@/lib/queries";
+import { itemsQuery } from "@/lib/queries";
 
 function GroupShoppingList() {
 	const { groupId, tripId } = useParams();
 	const base = tripId ? `/groups/${groupId}/trips/${tripId}` : `/groups/${groupId}`;
 
-	const trip = useQuery(tripQuery(groupId!, tripId));
 	const items = useQuery(itemsQuery(groupId!, tripId));
 
 	return (
 		<section
 			aria-label={tripId ? "Trip items" : "Group shopping list"}
 			className="flex flex-1 flex-col gap-4">
-			<h2 className="font-heading text-lg font-semibold">
-				{tripId && trip.isSuccess ? trip.data!.name : "Shopping list"}
-			</h2>
 			{!items.isLoading ? (
 				items.isSuccess ? (
 					items.data.length ? (
