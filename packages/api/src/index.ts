@@ -44,6 +44,7 @@ const app = new Hono<AppEnv<false>>()
 			);
 		}
 		// For any other unexpected errors, log and return a generic 500 response
+		console.error(err.name + ": " + err.message);
 		console.error(err);
 		return c.json(
 			{
