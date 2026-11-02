@@ -10,7 +10,11 @@
 	// 	"directory": "dist",
 	// },
 	"observability": {
-		"enabled": true
+		"logs": {
+			"enabled": true,
+			"invocation_logs": true,
+			"persist": true
+		}
 	},
 	"d1_databases": [
 		{
