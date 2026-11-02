@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { authClient, client } from "@/lib/client";
 import { errorMessage, groupQuery, groupsQuery, membersQuery } from "@/lib/queries";
 import { cn } from "@/lib/utils";
-import type { Group, User } from "@grocery-split/validation";
 
 interface GroupSettingsFormProps {
 	group: Group;

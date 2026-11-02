@@ -1,5 +1,5 @@
 import { useId, useState, type FormEvent } from "react";
-import { validator, type Item, type User, type WantedItem } from "@grocery-split/validation";
+import { validator, type Item, type User } from "@grocery-split/validation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { parseResponse } from "hono/client";
 import { useNavigate, useParams } from "react-router";
@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { client } from "@/lib/client";
 import { errorMessage, itemQuery, itemSharesQuery, membersQuery } from "@/lib/queries";
 import { cn, formatPrice } from "@/lib/utils";
-import type { Item, User } from "@grocery-split/validation";
 
 // Friendlier wording for the fields people can actually get wrong
 const itemFieldErrors: Partial<Record<PropertyKey, string>> = {
