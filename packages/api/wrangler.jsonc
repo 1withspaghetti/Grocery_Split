@@ -3,7 +3,7 @@
 	"name": "grocery-split",
 	"main": "dist/index.js",
 	// Set this to today's date
-	"compatibility_date": "2026-09-29",
+	"compatibility_date": "2026-10-30",
 	"compatibility_flags": ["nodejs_als"],
 	// "assets": {
 	// 	"binding": "ASSETS",
