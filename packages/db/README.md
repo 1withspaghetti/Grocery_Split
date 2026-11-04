@@ -51,6 +51,10 @@ Applies any new migrations to the **production database**, requires the .env var
 pnpm run db:migrate-prod
 ```
 
+## Seed database
+
+Seeds the database with a bunch of dummy data, used for testing
+
 ## Other Commands
 
 Check the migration files for conflicts

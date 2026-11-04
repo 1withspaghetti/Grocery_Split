@@ -41,8 +41,8 @@ pnpm install
 In order to prepare the database for local development for the first time (or after any database changes, see [`packages/db/README.md`](packages/db/README.md)):
 
 ```bash
-pnpm --filter @grocery-split/api create-database
 pnpm --filter @grocery-split/db db:migrate
+pnpm --filter @grocery-split/db db:seed
 ```
 
 ### Run Locally
