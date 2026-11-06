@@ -41,6 +41,7 @@ async function validateShareMembers(groupId: string, userIds: string[]) {
 // Is a route defined in ./groups.ts so auth is already enforced
 const items = new Hono<AppEnv<true>>()
 	// Getting all items in the main list (if ?trip=null), or only a specific trip (?trip=id_here)
+	// Oldest first so new items are added to the bottom of the list (id breaks ties so the order is stable)
 	.get("/", validateGroupParam, zValidator("query", validator.tripQuery), async (c) => {
 		const { tripId } = c.req.valid("query");
 
@@ -57,7 +58,8 @@ const items = new Hono<AppEnv<true>>()
 			where: {
 				groupId: c.var.groupId,
 				tripId: tripId !== undefined ? tripId : { isNull: true }
-			}
+			},
+			orderBy: { createdAt: "asc", id: "asc" }
 		});
 
 		return c.json(res as PopulatedItem[]);
