@@ -1,4 +1,4 @@
-# Grocery Split
+﻿# Grocery Split
 
 Grocery Split is a web application for roommates to coordinate grocery shopping and split costs fairly, including the cost of shared bulk items.
 
@@ -66,3 +66,16 @@ Automated tests are not configured yet. No test command is currently available.
 ## Contributing
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution guidelines.
+
+## TE6: Access Control
+
+We use Better Auth with Google sign-in instead of passwords. The session token is kept in an httpOnly cookie and sent with every API call.
+
+### Sign Up
+![Sign Up](TE6/TE6-SignUp-Flow.png)
+
+### Sign In
+![Sign In](TE6/TE6-SignIn-Flow.png)
+
+### Protected Request
+![Protected Request](TE6/TE6-Protected-Request.png)
