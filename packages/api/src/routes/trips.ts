@@ -3,7 +3,7 @@ import type { AppEnv } from "../index.ts";
 import { validateGroupAndTripParam, validateGroupParam } from "../middleware/validateParams.ts";
 import { db } from "../lib/db.ts";
 import { schema } from "@grocery-split/db";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import { validator, type Trip } from "@grocery-split/validation";
 import { zValidator } from "../middleware/zValidator.ts";
@@ -12,9 +12,13 @@ import { firstOrNotFound } from "../lib/firstOrNotFound.ts";
 
 // Is a route defined in ./groups.ts so auth is already enforced
 const trips = new Hono<AppEnv<true>>()
-	// List all trips in the current group
+	// List all trips in the current group, newest first (id breaks ties so the order is stable)
 	.get("/", validateGroupParam, async (c) => {
-		const res = await db.select().from(schema.trip).where(eq(schema.trip.groupId, c.var.groupId));
+		const res = await db
+			.select()
+			.from(schema.trip)
+			.where(eq(schema.trip.groupId, c.var.groupId))
+			.orderBy(desc(schema.trip.createdAt), desc(schema.trip.id));
 
 		return c.json(res as Trip[]);
 	})
