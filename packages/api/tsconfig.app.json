@@ -1,0 +1,31 @@
+{
+	"extends": ["@tsconfig/node26/tsconfig.json", "@tsconfig/node-ts/tsconfig.json"],
+
+	// Visit https://aka.ms/tsconfig to read more about this file
+	"compilerOptions": {
+		"rootDir": "./src",
+		"outDir": "./dist",
+
+		"types": ["./worker-configuration.d.ts", "node"],
+
+		"sourceMap": false,
+		"declaration": false,
+		"declarationMap": false,
+
+		// Stricter Typechecking Options
+		"noUncheckedIndexedAccess": false,
+		"exactOptionalPropertyTypes": false,
+
+		// Style Options
+		// "noImplicitReturns": true,
+		// "noImplicitOverride": true,
+		// "noUnusedLocals": true,
+		// "noUnusedParameters": true,
+		// "noFallthroughCasesInSwitch": true,
+		// "noPropertyAccessFromIndexSignature": true,
+
+		// Recommended Options
+		"strict": true
+	},
+	"include": ["src/**/*"]
+}

@@ -1,0 +1,15 @@
+{
+	"extends": ["@tsconfig/node26/tsconfig.json", "@tsconfig/node-ts/tsconfig.json"],
+	"compilerOptions": {
+		"module": "esnext",
+		"moduleResolution": "bundler",
+		"types": [
+			"@cloudflare/vitest-plugin/types" // provides `cloudflare:test` and `cloudflare:workers` types
+		],
+		"strict": true
+	},
+	"include": [
+		"test/**/*",
+		"./worker-configuration.d.ts" // output of `wrangler types`
+	]
+}

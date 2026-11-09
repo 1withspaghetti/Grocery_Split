@@ -16,9 +16,11 @@
 		"build": "tsc",
 		"preview": "pnpm run build && wrangler dev",
 		"deploy": "pnpm run build && wrangler deploy",
-		"cf-typegen": "wrangler types --env-interface CloudflareBindings"
+		"cf-typegen": "wrangler types --env-interface CloudflareBindings",
+		"test": "vitest"
 	},
 	"devDependencies": {
+		"@cloudflare/vitest-plugin": "^1.6.0",
 		"@grocery-split/db": "workspace:*",
 		"@grocery-split/eslint-config": "workspace:*",
 		"@grocery-split/prettier-config": "workspace:*",
@@ -31,6 +33,7 @@
 		"lint-staged": "^17.5.1",
 		"prettier": "3.9.6",
 		"typescript": "~6.0.3",
+		"vitest": "^4.1.12",
 		"wrangler": "^4.156.0"
 	},
 	"lint-staged": {
