@@ -4,12 +4,14 @@
 		"module": "esnext",
 		"moduleResolution": "bundler",
 		"types": [
+			"node",
 			"@cloudflare/vitest-plugin/types" // provides `cloudflare:test` and `cloudflare:workers` types
 		],
 		"strict": true
 	},
 	"include": [
 		"test/**/*",
+		"test/env.d.ts",
 		"./worker-configuration.d.ts" // output of `wrangler types`
 	]
 }

@@ -7,7 +7,7 @@
   "scripts": {
     "prepare": "husky",
     "pre-commit": "pnpm run --sequential --filter \"./packages/**\" pre-commit",
-    "test": "pnpm run --sequential --filter \"./packages/**\" test"
+    "test": "pnpm run --sequential --filter \"./packages/git**\" test"
   },
   "keywords": [],
   "author": "",

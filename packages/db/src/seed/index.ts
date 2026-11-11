@@ -1,14 +1,17 @@
 import { type DrizzleD1Database } from "drizzle-orm/d1";
-import { migrate } from "drizzle-orm/d1/migrator";
+import { migrate as _migrate } from "drizzle-orm/d1/migrator";
 import { relations, schema } from "../index.ts";
 import { inArray } from "drizzle-orm";
 import { items, groups, users, memberships, trips, wantedItems } from "./data.ts";
+import { resolve } from "path";
 
-export async function seed(db: DrizzleD1Database<typeof relations>) {
+export async function migrate(db: DrizzleD1Database<typeof relations>) {
 	// Migrate database
 	console.log("Migrating database...");
-	migrate(db, { migrationsFolder: "../db/migrations" });
+	await _migrate(db, { migrationsFolder: resolve(import.meta.dirname, "../../migrations") });
+}
 
+export async function seed(db: DrizzleD1Database<typeof relations>) {
 	// Fetching existing users
 	const realUsers = await db.query.user.findMany({
 		columns: { id: true },

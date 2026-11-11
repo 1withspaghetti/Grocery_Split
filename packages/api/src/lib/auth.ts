@@ -4,6 +4,7 @@ import { env } from "cloudflare:workers";
 import { db } from "./db.ts";
 import { schema } from "@grocery-split/db";
 import { nanoid } from "./nanoid.ts";
+import { testUtils } from "better-auth/plugins";
 
 export const auth = betterAuth({
 	appName: "Grocery Split",
@@ -25,5 +26,6 @@ export const auth = betterAuth({
 			generateId: () => nanoid(),
 			joins: true
 		}
-	}
+	},
+	plugins: [...(process.env.MODE === "test" ? [testUtils()] : [])]
 });

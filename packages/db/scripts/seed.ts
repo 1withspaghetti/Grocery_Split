@@ -1,6 +1,7 @@
 import { relations, seed } from "../src/index.ts";
 import { drizzle } from "drizzle-orm/d1";
 import { getPlatformProxy } from "wrangler";
+import { migrate } from "../src/seed/index.ts";
 
 const { env, dispose } = await getPlatformProxy<CloudflareBindings>({
 	configPath: "../api/wrangler.jsonc",
@@ -8,6 +9,7 @@ const { env, dispose } = await getPlatformProxy<CloudflareBindings>({
 });
 
 const db = drizzle(env.DB, { relations: relations });
+await migrate(db);
 await seed(db);
 
 await dispose();
