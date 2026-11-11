@@ -5,13 +5,14 @@ import { inArray } from "drizzle-orm";
 import { items, groups, users, memberships, trips, wantedItems } from "./data.ts";
 import { resolve } from "path";
 
-export async function migrate(db: DrizzleD1Database<typeof relations>) {
+export async function migrate(db: DrizzleD1Database<typeof relations>, log: boolean = false) {
 	// Migrate database
-	console.log("Migrating database...");
+	if (log) console.log("Migrating database...");
 	await _migrate(db, { migrationsFolder: resolve(import.meta.dirname, "../../migrations") });
+	if (log) console.log("Done migrating");
 }
 
-export async function seed(db: DrizzleD1Database<typeof relations>) {
+export async function seed(db: DrizzleD1Database<typeof relations>, log: boolean = false) {
 	// Fetching existing users
 	const realUsers = await db.query.user.findMany({
 		columns: { id: true },
@@ -19,10 +20,10 @@ export async function seed(db: DrizzleD1Database<typeof relations>) {
 			accounts: true
 		}
 	});
-	console.log("Fetched real users...", realUsers);
+	if (log) console.log("Fetched real users...", realUsers);
 
 	// Delete everything from all schema-defined tables
-	console.log("Resting database...");
+	if (log) console.log("Resting database...");
 	await db.delete(schema.wantedItem).where(
 		inArray(
 			schema.wantedItem.itemId,
@@ -61,7 +62,7 @@ export async function seed(db: DrizzleD1Database<typeof relations>) {
 	);
 
 	// Seed data
-	console.log("Adding dummy data...");
+	if (log) console.log("Adding dummy data...");
 	await db.insert(schema.user).values(users);
 	await db.insert(schema.group).values(groups);
 	await db.insert(schema.membership).values(memberships);
@@ -69,7 +70,7 @@ export async function seed(db: DrizzleD1Database<typeof relations>) {
 	await db.insert(schema.item).values(items);
 	await db.insert(schema.wantedItem).values(wantedItems);
 
-	console.log("Adding real users to dummy groups...");
+	if (log) console.log("Adding real users to dummy groups...");
 	for (const userId of realUsers.map((row) => row.id))
 		await db.insert(schema.membership).values(
 			["group00000000001", "group00000000002"].map((groupId) => ({
@@ -79,5 +80,5 @@ export async function seed(db: DrizzleD1Database<typeof relations>) {
 			}))
 		);
 
-	console.log("Done");
+	if (log) console.log("Done seeding");
 }

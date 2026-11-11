@@ -9,7 +9,7 @@ const { env, dispose } = await getPlatformProxy<CloudflareBindings>({
 });
 
 const db = drizzle(env.DB, { relations: relations });
-await migrate(db);
-await seed(db);
+await migrate(db, true);
+await seed(db, true);
 
 await dispose();
