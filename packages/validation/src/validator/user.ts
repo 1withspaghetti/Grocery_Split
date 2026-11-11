@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const user = z.object({
+export const user = z.strictObject({
 	email: z.email(),
 	name: z.string().min(1).max(128)
 });

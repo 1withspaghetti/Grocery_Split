@@ -1,7 +1,7 @@
 import z from "zod";
 import { idValidator } from "./id.ts";
 
-export const item = z.object({
+export const item = z.strictObject({
 	name: z.string().min(1).max(128),
 	quantity: z.string().max(128).nullable(),
 	notes: z.string().max(1024).nullable(),
@@ -11,7 +11,7 @@ export const item = z.object({
 
 export type NewItem = z.infer<typeof item>;
 
-export const wantedItem = z.object({
+export const wantedItem = z.strictObject({
 	userId: idValidator,
 	parts: z.int32().min(1)
 });
