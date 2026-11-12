@@ -6,6 +6,7 @@ import { seed, relations } from "@grocery-split/db";
 import { drizzle } from "drizzle-orm/d1";
 import { applyD1Migrations } from "cloudflare:test";
 import { api } from "./utils";
+import type { Group } from "@grocery-split/validation";
 
 describe("groups routes", () => {
 	let authTestHelper: TestHelpers;
@@ -81,14 +82,14 @@ describe("groups routes", () => {
 		const headers = await authTestHelper.getAuthHeaders({ userId: "user000000000001" });
 		const res = await api.get("/api/groups/group99999999999", { headers });
 		expect(res.status).toBe(404);
-		expect(await res.json()).toStrictEqual({ message: "Group Not Found" });
+		expect(await res.json()).toStrictEqual({ message: "Not Found" });
 	});
 
 	it("fails to get group whom you are not a member of", async () => {
 		const headers = await authTestHelper.getAuthHeaders({ userId: "user000000000001" });
 		const res = await api.get("/api/groups/group00000000002", { headers });
 		expect(res.status).toBe(404);
-		expect(await res.json()).toStrictEqual({ message: "Group Not Found" });
+		expect(await res.json()).toStrictEqual({ message: "Not Found" });
 	});
 
 	it("responds with the group for group1", async () => {
@@ -126,14 +127,14 @@ describe("groups routes", () => {
 		const headers = await authTestHelper.getAuthHeaders({ userId: "user000000000001" });
 		const res = await api.get("/api/groups/group99999999999/members", { headers });
 		expect(res.status).toBe(404);
-		expect(await res.json()).toStrictEqual({ message: "Group Not Found" });
+		expect(await res.json()).toStrictEqual({ message: "Not Found" });
 	});
 
 	it("fails to list group members for a group whom you are not a member of", async () => {
 		const headers = await authTestHelper.getAuthHeaders({ userId: "user000000000001" });
 		const res = await api.get("/api/groups/group00000000002/members", { headers });
 		expect(res.status).toBe(404);
-		expect(await res.json()).toStrictEqual({ message: "Group Not Found" });
+		expect(await res.json()).toStrictEqual({ message: "Not Found" });
 	});
 
 	it("responds with the group members for group1", async () => {
@@ -220,12 +221,14 @@ describe("groups routes", () => {
 		};
 		const res = await api.post("/api/groups", body, { headers });
 		expect(res.status).toBe(200);
-		const resBody = (await res.json()) as unknown;
-		expect(resBody).toHaveProperty("id");
-		expect(resBody).toHaveProperty("name", "Test Group");
-		expect(resBody).toHaveProperty("ownerId", "user000000000003");
-		createdGroupId = (resBody as { id: string }).id;
+		const resBody = (await res.json()) as Group;
+		createdGroupId = resBody.id;
 		console.log("created group id", createdGroupId);
+		expect(resBody).toStrictEqual({
+			id: createdGroupId,
+			name: "Test Group",
+			ownerId: "user000000000003"
+		});
 	});
 
 	it("responds with the group for newly created group", async () => {
@@ -266,14 +269,14 @@ describe("groups routes", () => {
 		const headers = await authTestHelper.getAuthHeaders({ userId: "user000000000003" });
 		const res = await api.patch("/api/groups/group99999999999", {}, { headers });
 		expect(res.status).toBe(404);
-		expect(await res.json()).toStrictEqual({ message: "Group Not Found" });
+		expect(await res.json()).toStrictEqual({ message: "Not Found" });
 	});
 
 	it("fails to edit a group whom you are not a member of", async () => {
 		const headers = await authTestHelper.getAuthHeaders({ userId: "user000000000001" });
 		const res = await api.patch("/api/groups/group00000000002", {}, { headers });
 		expect(res.status).toBe(404);
-		expect(await res.json()).toStrictEqual({ message: "Group Not Found" });
+		expect(await res.json()).toStrictEqual({ message: "Not Found" });
 	});
 
 	it("fails to edit a group with missing parameters", async () => {
@@ -342,33 +345,33 @@ describe("groups routes", () => {
 		const headers = await authTestHelper.getAuthHeaders({ userId: "user000000000001" });
 		const res = await api.delete("/api/groups/group99999999999", { headers });
 		expect(res.status).toBe(404);
-		expect(await res.json()).toStrictEqual({ message: "Group Not Found" });
+		expect(await res.json()).toStrictEqual({ message: "Not Found" });
 	});
 
 	it("fails to delete a group whom you are not a member of", async () => {
 		const headers = await authTestHelper.getAuthHeaders({ userId: "user000000000001" });
 		const res = await api.delete("/api/groups/group00000000002", { headers });
 		expect(res.status).toBe(404);
-		expect(await res.json()).toStrictEqual({ message: "Group Not Found" });
+		expect(await res.json()).toStrictEqual({ message: "Not Found" });
 	});
 
 	it("fails to delete a group whom you are not the owner of", async () => {
 		const headers = await authTestHelper.getAuthHeaders({ userId: "user000000000002" });
 		const res = await api.delete("/api/groups/group00000000001", { headers });
 		expect(res.status).toBe(404);
-		expect(await res.json()).toStrictEqual({ message: "Group Not Found" });
+		expect(await res.json()).toStrictEqual({ message: "Not Found" });
 	});
 
 	it("deletes a group", async () => {
 		const headers = await authTestHelper.getAuthHeaders({ userId: "user000000000003" });
 		const res = await api.delete(`/api/groups/${createdGroupId}`, { headers });
-		expect(res.status).toBe(200);
+		expect(res.status).toBe(204);
 	});
 
 	it("fails to fetch deleted group", async () => {
 		const headers = await authTestHelper.getAuthHeaders({ userId: "user000000000003" });
 		const res = await api.get(`/api/groups/${createdGroupId}`, { headers });
 		expect(res.status).toBe(404);
-		expect(await res.json()).toStrictEqual({ message: "Group Not Found" });
+		expect(await res.json()).toStrictEqual({ message: "Not Found" });
 	});
 });

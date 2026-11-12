@@ -28,10 +28,10 @@ const trips = new Hono<AppEnv<true>>()
 		// We know the user must be a part of this group due to the enforceUserInGroup middleware
 		const res = await db.select().from(schema.trip).where(eq(schema.trip.id, c.var.tripId));
 
-		return c.json(firstOrNotFound(res, "Trip Not Found") as Trip);
+		return c.json(firstOrNotFound(res) as Trip);
 	})
 
-	// Creating groups
+	// Creating trips
 	.post("/", validateGroupParam, zValidator("json", validator.trip), async (c) => {
 		const { user } = c.var.session;
 		const data = c.req.valid("json");
@@ -50,18 +50,18 @@ const trips = new Hono<AppEnv<true>>()
 		return c.json(res[0] as Trip);
 	})
 
-	// Updating group
+	// Updating trip
 	.patch("/:tripId", validateGroupAndTripParam, zValidator("json", validator.trip), async (c) => {
 		const data = c.req.valid("json");
 
-		// Update the actual group
+		// Update the actual trip
 		const res = await db
 			.update(schema.trip)
 			.set(data)
 			.where(eq(schema.trip.id, c.var.tripId))
 			.returning();
 
-		return c.json(firstOrNotFound(res, "Trip Not Found") as Trip);
+		return c.json(firstOrNotFound(res) as Trip);
 	})
 
 	// Unassign items before deleting the trip so they remain on the main shopping list.

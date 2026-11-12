@@ -51,7 +51,7 @@ const group = new Hono<AppEnv<true>>()
 		// We know the user must be a part of this group due to the enforceUserInGroup middleware
 		const res = await db.select().from(schema.group).where(eq(schema.group.id, c.var.groupId));
 
-		return c.json(firstOrNotFound(res, "Group Not Found") as Group);
+		return c.json(firstOrNotFound(res) as Group);
 	})
 
 	// Creating groups
@@ -72,7 +72,7 @@ const group = new Hono<AppEnv<true>>()
 			db.insert(schema.membership).values({ groupId, userId: user.id })
 		]);
 
-		return c.json(firstOrNotFound(res, "Group Not Found") as Group);
+		return c.json(firstOrNotFound(res) as Group);
 	})
 
 	// Updating group
@@ -86,7 +86,7 @@ const group = new Hono<AppEnv<true>>()
 			.where(eq(schema.group.id, c.var.groupId))
 			.returning();
 
-		return c.json(firstOrNotFound(res, "Group Not Found") as Group);
+		return c.json(firstOrNotFound(res) as Group);
 	})
 
 	// Updating group owner (can only be done by the existing group owner)
@@ -117,7 +117,7 @@ const group = new Hono<AppEnv<true>>()
 				.where(and(eq(schema.group.id, c.var.groupId), eq(schema.group.ownerId, user.id))) // Make sure the current ownerId matches the user making the request
 				.returning();
 
-			return c.json(firstOrNotFound(res, "Group Not Found") as Group);
+			return c.json(firstOrNotFound(res) as Group);
 		}
 	)
 
@@ -130,7 +130,9 @@ const group = new Hono<AppEnv<true>>()
 			.where(and(eq(schema.group.id, c.var.groupId), eq(schema.group.ownerId, user.id)))
 			.returning();
 
-		return c.json(firstOrNotFound(res, "Group Not Found") as Group);
+		if (res.length == 0) throw new HTTPException(404, { message: "Not Found" });
+
+		return c.body(null, 204);
 	})
 
 	// Handle all trip requests related to this group

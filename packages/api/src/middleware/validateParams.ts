@@ -20,7 +20,7 @@ export const validateGroupParam = createMiddleware<
 		.select({ count: count() })
 		.from(schema.membership)
 		.where(and(eq(schema.membership.groupId, data.groupId), eq(schema.membership.userId, user.id)));
-	if (!exists || exists.count == 0) throw new HTTPException(404, { message: "Group Not Found" });
+	if (!exists || exists.count == 0) throw new HTTPException(404, { message: "Not Found" });
 
 	c.set("groupId", data.groupId);
 
@@ -48,8 +48,7 @@ export const validateGroupAndTripParam = createMiddleware<
 				eq(schema.trip.id, data.tripId)
 			)
 		);
-	if (!exists || exists.count == 0)
-		throw new HTTPException(404, { message: "Group or Trip Not Found" });
+	if (!exists || exists.count == 0) throw new HTTPException(404, { message: "Not Found" });
 
 	c.set("groupId", data.groupId);
 	c.set("tripId", data.tripId);
@@ -77,8 +76,7 @@ export const validateGroupAndItemParam = createMiddleware<
 				eq(schema.item.id, data.itemId)
 			)
 		);
-	if (!exists || exists.count == 0)
-		throw new HTTPException(404, { message: "Group or Trip Not Found" });
+	if (!exists || exists.count == 0) throw new HTTPException(404, { message: "Not Found" });
 
 	c.set("groupId", data.groupId);
 	c.set("itemId", data.itemId);
