@@ -11,7 +11,7 @@ import {
 	DialogTrigger
 } from "@/components/ui/dialog";
 import { usePageHandle } from "@/components/AppLayout";
-import { groupQuery } from "@/lib/queries";
+import { groupQuery, tripQuery } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 
 const tabs = [
@@ -25,6 +25,9 @@ function GroupTabs() {
 	const page = usePageHandle();
 	const groupId = params.groupId ?? "";
 	const { data: group, isPending } = useQuery(groupQuery(groupId));
+	const { data: trip } = useQuery(tripQuery(groupId, params.tripId));
+	// Subtitle under the group name so each section is distinct, a trip shows its own name once loaded
+	const subtitle = trip?.name ?? page?.handle.title;
 
 	if (isPending) {
 		return (
@@ -61,9 +64,10 @@ function GroupTabs() {
 					<div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary font-heading text-lg font-semibold">
 						{group.name[0]}
 					</div>
-					<h1 className="min-w-0 flex-1 font-heading text-xl font-bold break-words sm:text-2xl">
-						{group.name}
-					</h1>
+					<div className="min-w-0 flex-1">
+						<h1 className="font-heading text-xl font-bold break-words sm:text-2xl">{group.name}</h1>
+						{subtitle && <p className="text-sm break-words text-muted-foreground">{subtitle}</p>}
+					</div>
 					<Dialog>
 						<DialogTrigger render={<Button variant="outline" className="h-11 rounded-xl" />}>
 							<UserPlus aria-hidden="true" className="size-4" />
