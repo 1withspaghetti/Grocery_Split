@@ -4,6 +4,7 @@ import { AvatarGroup, UserAvatar } from "@/components/ui/avatar";
 import { Link } from "react-router";
 import { ChevronRight, Users } from "lucide-react";
 import AddButton from "@/components/AddButton";
+import JoinGroupDialog from "@/components/JoinGroupDialog";
 import { authClient } from "@/lib/client";
 import { errorMessage, groupsQuery, membersQuery } from "@/lib/queries";
 import type { User } from "@grocery-split/validation";
@@ -44,7 +45,12 @@ function MyGroups() {
 	return (
 		<main className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col gap-5 bg-background p-4 sm:gap-6 sm:p-6 lg:p-8">
 			<header className="flex items-center justify-between gap-4">
-				<h1 className="font-heading text-xl font-bold sm:text-2xl">My Groups</h1>
+				<div>
+					<h1 className="font-heading text-xl font-bold sm:text-2xl">My Groups</h1>
+					<p className="mt-1 text-xs font-medium text-muted-foreground">
+						Have a code? <JoinGroupDialog />
+					</p>
+				</div>
 				{session && <UserAvatar user={session.user as User} />}
 			</header>
 
