@@ -28,7 +28,7 @@ function ShoppingList({
 			</TableHeader>
 			<TableBody>
 				{items.map((item) => (
-					<TableRow>
+					<TableRow key={item.id}>
 						<TableCell className="w-full truncate text-base font-semibold">{item.name}</TableCell>
 						<TableCell className="truncate">{item.quantity}</TableCell>
 						{showPrice && (

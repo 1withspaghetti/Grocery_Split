@@ -1,6 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { DetailedError, parseResponse } from "hono/client";
 import { client } from "@/lib/client";
+import { validator, type ItemSort } from "@grocery-split/validation";
 
 const groups = client.api.groups;
 const group = groups[":groupId"];
@@ -37,10 +38,15 @@ export const tripQuery = (groupId: string, tripId?: string) =>
 			parseResponse(group.trips[":tripId"].$get({ param: { groupId, tripId: tripId! } }))
 	});
 
-export const itemsQuery = (groupId: string, tripId?: string) =>
+export const itemsQuery = (
+	groupId: string,
+	tripId?: string,
+	{ sort, order }: ItemSort = validator.itemSort.parse({})
+) =>
 	queryOptions({
-		queryKey: ["groups", groupId, "trips", tripId, "items"],
-		queryFn: () => parseResponse(group.items.$get({ param: { groupId }, query: { tripId } }))
+		queryKey: ["groups", groupId, "trips", tripId, "items", sort, order],
+		queryFn: () =>
+			parseResponse(group.items.$get({ param: { groupId }, query: { tripId, sort, order } }))
 	});
 
 export const itemQuery = (groupId: string, itemId: string) =>
