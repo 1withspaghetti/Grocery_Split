@@ -3,6 +3,8 @@ import type { Group } from "./group.ts";
 import type { Trip } from "./trip.ts";
 import type { User } from "./user.ts";
 
+export type { ItemSort } from "../validator/param.ts";
+
 export interface Item {
 	id: ID;
 	groupId: Group["id"];

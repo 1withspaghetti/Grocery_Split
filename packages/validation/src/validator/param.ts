@@ -18,3 +18,13 @@ export const groupItemParams = z.object({
 export const tripQuery = z.object({
 	tripId: idValidator.optional()
 });
+
+// How an item list is sorted, defaults to oldest first so new items are added to the bottom
+export const itemSort = z.object({
+	sort: z.enum(["createdAt", "name", "price"]).default("createdAt"),
+	order: z.enum(["asc", "desc"]).default("asc")
+});
+
+export type ItemSort = z.infer<typeof itemSort>;
+
+export const itemListQuery = tripQuery.extend(itemSort.shape);

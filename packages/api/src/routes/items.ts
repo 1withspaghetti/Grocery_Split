@@ -41,9 +41,9 @@ async function validateShareMembers(groupId: string, userIds: string[]) {
 // Is a route defined in ./groups.ts so auth is already enforced
 const items = new Hono<AppEnv<true>>()
 	// Getting all items in the main list (if ?trip=null), or only a specific trip (?trip=id_here)
-	// Oldest first so new items are added to the bottom of the list (id breaks ties so the order is stable)
-	.get("/", validateGroupParam, zValidator("query", validator.tripQuery), async (c) => {
-		const { tripId } = c.req.valid("query");
+	// Sorted with ?sort=createdAt|name|price&order=asc|desc, defaults to oldest first so new items are added to the bottom
+	.get("/", validateGroupParam, zValidator("query", validator.itemListQuery), async (c) => {
+		const { tripId, sort, order } = c.req.valid("query");
 
 		await validateTripId(c.var.groupId, tripId);
 
@@ -59,7 +59,21 @@ const items = new Hono<AppEnv<true>>()
 				groupId: c.var.groupId,
 				tripId: tripId !== undefined ? tripId : { isNull: true }
 			},
-			orderBy: { createdAt: "asc", id: "asc" }
+			orderBy: (item, { asc, desc, sql }) => {
+				const direction = order === "asc" ? asc : desc;
+				// Items with the same value fall back to oldest first (id breaks ties so the order is stable)
+				const tiebreak = [asc(item.createdAt), asc(item.id)];
+
+				switch (sort) {
+					case "name":
+						return [direction(sql`lower(${item.name})`), ...tiebreak];
+					case "price":
+						// Items without a price yet always go last
+						return [asc(sql`${item.price} is null`), direction(item.price), ...tiebreak];
+					default:
+						return [direction(item.createdAt), direction(item.id)];
+				}
+			}
 		});
 
 		return c.json(res as PopulatedItem[]);
