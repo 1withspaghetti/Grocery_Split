@@ -1,6 +1,7 @@
 import { auth } from "./lib/auth.ts";
 import { Hono, type Env } from "hono";
 import group from "./routes/groups.ts";
+import invites from "./routes/invites.ts";
 import { HTTPException } from "hono/http-exception";
 import { useAuth } from "./middleware/auth.ts";
 import { cors } from "hono/cors";
@@ -30,6 +31,7 @@ const app = new Hono<AppEnv<false>>()
 
 	// routes
 	.route("/groups", group)
+	.route("/invites", invites)
 
 	// error handling
 	.notFound((c) => c.json({ message: "Not Found" }, 404))

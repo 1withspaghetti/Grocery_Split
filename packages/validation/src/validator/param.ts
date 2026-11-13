@@ -15,6 +15,10 @@ export const groupItemParams = z.object({
 	itemId: idValidator
 });
 
+export const inviteParams = z.object({
+	code: z.string().regex(/^[0-9a-zA-Z]{1,16}$/, "Invalid Invite Code")
+});
+
 export const tripQuery = z.object({
 	tripId: idValidator.optional()
 });
