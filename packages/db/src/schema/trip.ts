@@ -11,12 +11,14 @@ export const trip = snakeCase.table(
 		groupId: text()
 			.notNull()
 			.references(() => group.id, { onDelete: "cascade" }),
+		paidById: text() // Nullable if it hasn't been paid out yet
+			.references(() => user.id, { onDelete: "no action" }),
 		createdAt: integer()
 			.notNull()
 			.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`),
 		createdById: text()
 			.notNull()
-			.references(() => user.id, { onDelete: "set null" })
+			.references(() => user.id, { onDelete: "no action" })
 	},
-	(t) => [index("trip_groupId_idx").on(t.groupId)]
+	(t) => [index("trip_groupId_createdAt_idx").on(t.groupId, t.createdAt)]
 );

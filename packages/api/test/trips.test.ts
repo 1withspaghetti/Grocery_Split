@@ -87,6 +87,7 @@ describe("trips routes", () => {
 				id: "trip000000000002",
 				groupId: "group00000000001",
 				name: "Costco",
+				paidById: null,
 				createdById: "user000000000002",
 				createdAt: 946684800000
 			},
@@ -94,6 +95,7 @@ describe("trips routes", () => {
 				id: "trip000000000001",
 				groupId: "group00000000001",
 				name: "Trader Joes 10/8",
+				paidById: "user000000000001",
 				createdById: "user000000000001",
 				createdAt: 946684800000
 			}
@@ -109,6 +111,7 @@ describe("trips routes", () => {
 				id: "trip000000000003",
 				groupId: "group00000000002",
 				name: "Food4Less",
+				paidById: null,
 				createdById: "user000000000002",
 				createdAt: 946684800000
 			}
@@ -146,6 +149,7 @@ describe("trips routes", () => {
 			id: "trip000000000001",
 			groupId: "group00000000001",
 			name: "Trader Joes 10/8",
+			paidById: "user000000000001",
 			createdById: "user000000000001",
 			createdAt: 946684800000
 		});
@@ -159,6 +163,7 @@ describe("trips routes", () => {
 			id: "trip000000000003",
 			groupId: "group00000000002",
 			name: "Food4Less",
+			paidById: null,
 			createdById: "user000000000002",
 			createdAt: 946684800000
 		});
@@ -212,6 +217,7 @@ describe("trips routes", () => {
 			id: createdTripId,
 			groupId: "group00000000001",
 			name: "Test Trip",
+			paidById: null,
 			createdById: "user000000000001",
 			createdAt: createdTripAt
 		});
@@ -229,6 +235,7 @@ describe("trips routes", () => {
 			id: createdTripId,
 			groupId: "group00000000001",
 			name: "Test Trip",
+			paidById: null,
 			createdById: "user000000000001",
 			createdAt: createdTripAt
 		});
@@ -312,6 +319,7 @@ describe("trips routes", () => {
 			id: createdTripId,
 			groupId: "group00000000001",
 			name: "Test Trip edited",
+			paidById: null,
 			createdById: "user000000000001",
 			createdAt: createdTripAt
 		});
@@ -325,6 +333,7 @@ describe("trips routes", () => {
 			id: createdTripId,
 			groupId: "group00000000001",
 			name: "Test Trip edited",
+			paidById: null,
 			createdById: "user000000000001",
 			createdAt: createdTripAt
 		});

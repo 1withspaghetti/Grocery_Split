@@ -76,6 +76,7 @@ export const trips: (typeof schema.trip.$inferInsert)[] = [
 		id: "trip000000000001",
 		groupId: "group00000000001",
 		name: "Trader Joes 10/8",
+		paidById: "user000000000001",
 		createdById: "user000000000001",
 		createdAt: emptyTime
 	},
@@ -119,6 +120,7 @@ export const items: (typeof schema.item.$inferInsert)[] = [
 		tripId: "trip000000000001",
 		name: "Chicken Tikka Masala",
 		quantity: "1 bag",
+		price: 6.99,
 		createdById: "user000000000001",
 		createdAt: emptyTime
 	},
@@ -127,6 +129,7 @@ export const items: (typeof schema.item.$inferInsert)[] = [
 		groupId: "group00000000001",
 		tripId: "trip000000000001",
 		name: "Pizza Dough",
+		price: 6,
 		createdById: "user000000000002",
 		createdAt: emptyTime
 	},
@@ -191,6 +194,11 @@ export const wantedItems: (typeof schema.wantedItem.$inferInsert)[] = [
 		parts: 1
 	},
 	{
+		itemId: "item000000000004",
+		userId: "user000000000003",
+		parts: 1
+	},
+	{
 		itemId: "item000000000005",
 		userId: "user000000000001",
 		parts: 1
@@ -214,5 +222,26 @@ export const wantedItems: (typeof schema.wantedItem.$inferInsert)[] = [
 		itemId: "item000000000007",
 		userId: "user000000000003",
 		parts: 2
+	}
+];
+
+export const transactions: (typeof schema.transaction.$inferInsert)[] = [
+	{
+		id: "tran000000000001",
+		groupId: "group00000000001",
+		amount: 2,
+		fromId: "user000000000002",
+		toId: "user000000000001",
+		createdAt: emptyTime,
+		createdById: "user000000000002"
+	},
+	{
+		id: "tran000000000002",
+		groupId: "group00000000001",
+		amount: 1,
+		fromId: "user000000000003",
+		toId: "user000000000001",
+		createdAt: emptyTime,
+		createdById: "user000000000003"
 	}
 ];

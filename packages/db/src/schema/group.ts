@@ -43,7 +43,7 @@ export const invite = snakeCase.table(
 			.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`),
 		createdById: text()
 			.notNull()
-			.references(() => user.id, { onDelete: "cascade" })
+			.references(() => user.id, { onDelete: "no action" })
 	},
 	(t) => [index("invite_groupId_idx").on(t.groupId)]
 );

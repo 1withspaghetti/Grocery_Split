@@ -25,8 +25,8 @@ export const item = snakeCase.table(
 			.references(() => user.id, { onDelete: "set null" })
 	},
 	(t) => [
-		index("item_groupId_idx").on(t.groupId),
-		index("item_groupId_tripId_idx").on(t.groupId, t.tripId)
+		index("item_groupId_tripId_createdAt_idx").on(t.groupId, t.tripId, t.createdAt),
+		index("item_groupId_tripId_name_idx").on(t.groupId, t.tripId, t.name)
 	]
 );
 

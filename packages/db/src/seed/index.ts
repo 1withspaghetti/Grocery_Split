@@ -2,7 +2,7 @@ import { type DrizzleD1Database } from "drizzle-orm/d1";
 import { migrate as _migrate } from "drizzle-orm/d1/migrator";
 import { relations, schema } from "../index.ts";
 import { inArray } from "drizzle-orm";
-import { items, groups, users, memberships, trips, wantedItems } from "./data.ts";
+import { items, groups, users, memberships, trips, wantedItems, transactions } from "./data.ts";
 import { resolve } from "path";
 
 export async function migrate(db: DrizzleD1Database<typeof relations>, log: boolean = false) {
@@ -24,6 +24,12 @@ export async function seed(db: DrizzleD1Database<typeof relations>, log: boolean
 
 	// Delete everything from all schema-defined tables
 	if (log) console.log("Resting database...");
+	await db.delete(schema.transaction).where(
+		inArray(
+			schema.transaction.groupId,
+			groups.map((r) => r.id)
+		)
+	);
 	await db.delete(schema.wantedItem).where(
 		inArray(
 			schema.wantedItem.itemId,
@@ -69,6 +75,7 @@ export async function seed(db: DrizzleD1Database<typeof relations>, log: boolean
 	await db.insert(schema.trip).values(trips);
 	await db.insert(schema.item).values(items);
 	await db.insert(schema.wantedItem).values(wantedItems);
+	await db.insert(schema.transaction).values(transactions);
 
 	if (log) console.log("Adding real users to dummy groups...");
 	for (const userId of realUsers.map((row) => row.id))
