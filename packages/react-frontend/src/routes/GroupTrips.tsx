@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { errorMessage, itemsQuery, tripsQuery } from "@/lib/queries";
 import { cn, formatPrice } from "@/lib/utils";
 import AddButton from "@/components/AddButton";
+import EmptyState from "@/components/EmptyState";
 import InlineNameForm from "@/components/InlineNameForm";
 import { client } from "@/lib/client";
 import { parseResponse } from "hono/client";
@@ -101,13 +102,11 @@ function GroupTrips() {
 					<TripCard key={trip.id} groupId={groupId} trip={trip} />
 				))}
 				{trips?.length === 0 && !adding && (
-					<Card className="items-center gap-3 rounded-2xl px-6 py-12 text-center shadow-sm">
-						<ShoppingCart aria-hidden="true" className="size-8 text-primary" />
-						<h2 className="font-heading text-lg font-semibold">No trips yet</h2>
-						<p className="text-sm text-muted-foreground">
-							Start a new trip to organize your next grocery run.
-						</p>
-					</Card>
+					<EmptyState
+						icon={ShoppingCart}
+						title="No trips yet"
+						description="Start a new trip to organize your next grocery run."
+					/>
 				)}
 			</section>
 			<AddButton label="Create a trip" onClick={() => setAdding(true)} />

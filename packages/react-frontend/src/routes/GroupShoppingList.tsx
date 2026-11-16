@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from "react-router";
 import { CircleX, ListChecks, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import AddButton from "@/components/AddButton";
+import EmptyState from "@/components/EmptyState";
 import { useQuery } from "@tanstack/react-query";
 import ShoppingList from "@/components/ShoppingList";
 import InlineItemForm from "@/components/InlineItemForm";
@@ -67,10 +68,7 @@ function GroupShoppingList() {
 							}
 						/>
 					) : (
-						<Card className="items-center gap-3 rounded-2xl px-6 py-12 text-center shadow-sm">
-							<ListChecks aria-hidden="true" className="size-8 text-primary" />
-							<h3 className="text-lg font-semibold">No items yet</h3>
-						</Card>
+						<EmptyState icon={ListChecks} title="No items yet" />
 					)
 				) : (
 					<Card className="items-center gap-3 rounded-2xl px-6 py-12 text-center shadow-sm">

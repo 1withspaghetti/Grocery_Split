@@ -4,6 +4,7 @@ import { AvatarGroup, UserAvatar } from "@/components/ui/avatar";
 import { Link } from "react-router";
 import { ChevronRight, Users } from "lucide-react";
 import AddButton from "@/components/AddButton";
+import EmptyState from "@/components/EmptyState";
 import InlineNameForm from "@/components/InlineNameForm";
 import JoinGroupDialog from "@/components/JoinGroupDialog";
 import { authClient } from "@/lib/client";
@@ -87,13 +88,11 @@ function MyGroups() {
 					<GroupCard key={group.id} group={group} />
 				))}
 				{groups?.length === 0 && !adding && (
-					<Card className="items-center gap-3 rounded-2xl px-6 py-12 text-center shadow-sm">
-						<Users aria-hidden="true" className="size-8 text-primary" />
-						<h2 className="font-heading text-lg font-semibold">No groups yet</h2>
-						<p className="text-sm text-muted-foreground">
-							Create a group to start splitting your groceries.
-						</p>
-					</Card>
+					<EmptyState
+						icon={Users}
+						title="No groups yet"
+						description="Create a group to start splitting your groceries."
+					/>
 				)}
 			</section>
 
