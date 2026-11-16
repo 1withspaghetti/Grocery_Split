@@ -15,7 +15,9 @@ export default defineConfig({
 		VitePWA({
 			// caches all the imports
 			workbox: {
-				globPatterns: ["**/*"]
+				globPatterns: ["**/*"],
+				// Share previews are fetched by social platforms and do not need offline caching.
+				globIgnores: ["**/social-preview.png"]
 			},
 			// caches all the static assets in the public folder
 			includeAssets: ["**/*"],
@@ -30,9 +32,9 @@ export default defineConfig({
 				name: "Grocery Split",
 				icons: [
 					{
-						src: "/placeholder.svg",
-						sizes: "1x1",
-						type: "image/svg"
+						src: "/favicon.svg",
+						sizes: "any",
+						type: "image/svg+xml"
 					}
 				]
 			}

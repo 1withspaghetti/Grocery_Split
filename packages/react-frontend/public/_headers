@@ -1,0 +1,8 @@
+/groups
+	X-Robots-Tag: noindex, nofollow
+
+/groups/*
+	X-Robots-Tag: noindex, nofollow
+
+/invite/*
+	X-Robots-Tag: noindex, nofollow
