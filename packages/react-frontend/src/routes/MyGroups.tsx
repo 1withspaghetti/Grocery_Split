@@ -1,12 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { AvatarGroup, UserAvatar } from "@/components/ui/avatar";
 import { Link } from "react-router";
 import { ChevronRight, Users } from "lucide-react";
 import AddButton from "@/components/AddButton";
+import InlineNameForm from "@/components/InlineNameForm";
 import JoinGroupDialog from "@/components/JoinGroupDialog";
 import { authClient } from "@/lib/client";
 import { errorMessage, groupsQuery, membersQuery } from "@/lib/queries";
+import { client } from "@/lib/client";
+import { parseResponse } from "hono/client";
+import { useState } from "react";
 import type { User } from "@grocery-split/validation";
 
 function GroupCard({ group }: { group: { id: string; name: string } }) {
@@ -41,9 +45,18 @@ function GroupCard({ group }: { group: { id: string; name: string } }) {
 function MyGroups() {
 	const { data: session } = authClient.useSession();
 	const { data: groups, error, isPending } = useQuery(groupsQuery);
+	const queryClient = useQueryClient();
+	const [adding, setAdding] = useState(false);
+	const create = useMutation({
+		mutationFn: (name: string) => parseResponse(client.api.groups.$post({ json: { name } })),
+		onSuccess: () => {
+			void queryClient.invalidateQueries({ queryKey: groupsQuery.queryKey });
+			setAdding(false);
+		}
+	});
 
 	return (
-		<main className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col gap-5 bg-background p-4 sm:gap-6 sm:p-6 lg:p-8">
+		<main className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col gap-4 bg-background p-3 sm:gap-6 sm:p-6 lg:p-8">
 			<header className="flex items-center justify-between gap-4">
 				<div>
 					<h1 className="font-heading text-xl font-bold sm:text-2xl">My Groups</h1>
@@ -55,6 +68,15 @@ function MyGroups() {
 			</header>
 
 			<section aria-label="Your groups" className="grid grid-cols-1 gap-3 sm:gap-4">
+				{adding && (
+					<InlineNameForm
+						placeholder="Group name"
+						onCreate={create.mutate}
+						onCancel={() => setAdding(false)}
+						isPending={create.isPending}
+						error={create.error ? errorMessage(create.error) : undefined}
+					/>
+				)}
 				{isPending && <p className="text-sm text-muted-foreground">Loading groups…</p>}
 				{error && (
 					<p role="alert" className="text-sm text-destructive">
@@ -64,7 +86,7 @@ function MyGroups() {
 				{groups?.map((group) => (
 					<GroupCard key={group.id} group={group} />
 				))}
-				{groups?.length === 0 && (
+				{groups?.length === 0 && !adding && (
 					<Card className="items-center gap-3 rounded-2xl px-6 py-12 text-center shadow-sm">
 						<Users aria-hidden="true" className="size-8 text-primary" />
 						<h2 className="font-heading text-lg font-semibold">No groups yet</h2>
@@ -75,7 +97,7 @@ function MyGroups() {
 				)}
 			</section>
 
-			<AddButton to="/groups/new-group" label="Create a group" />
+			<AddButton label="Create a group" onClick={() => setAdding(true)} />
 		</main>
 	);
 }

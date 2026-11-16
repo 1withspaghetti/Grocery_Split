@@ -1,17 +1,20 @@
+import { useState } from "react";
 import { useParams, useSearchParams } from "react-router";
 import { CircleX, ListChecks, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import AddButton from "@/components/AddButton";
 import { useQuery } from "@tanstack/react-query";
 import ShoppingList from "@/components/ShoppingList";
+import InlineItemForm from "@/components/InlineItemForm";
 import ItemSortSelect from "@/components/ItemSortSelect";
 import { itemsQuery } from "@/lib/queries";
 import { validator, type ItemSort } from "@grocery-split/validation";
 
 function GroupShoppingList() {
 	const { groupId, tripId } = useParams();
-	const base = tripId ? `/groups/${groupId}/trips/${tripId}` : `/groups/${groupId}`;
 	const showPrice = tripId !== undefined;
+	const [editor, setEditor] = useState<string | "new" | null>(null);
+	const adding = editor === "new";
 
 	// The sort is kept in the url (?sort=name&order=asc) so it survives a refresh
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -44,8 +47,25 @@ function GroupShoppingList() {
 			)}
 			{!items.isLoading ? (
 				items.isSuccess ? (
-					items.data.length ? (
-						<ShoppingList base={base} items={items.data} showPrice={showPrice} />
+					items.data.length || adding ? (
+						<ShoppingList
+							groupId={groupId!}
+							tripId={tripId}
+							items={items.data}
+							showPrice={showPrice}
+							editingItemId={editor === "new" ? undefined : (editor ?? undefined)}
+							onEdit={(itemId) => setEditor(itemId || null)}
+							createRow={
+								adding ? (
+									<InlineItemForm
+										groupId={groupId!}
+										tripId={tripId}
+										showPrice={showPrice}
+										onCancel={() => setEditor(null)}
+									/>
+								) : undefined
+							}
+						/>
 					) : (
 						<Card className="items-center gap-3 rounded-2xl px-6 py-12 text-center shadow-sm">
 							<ListChecks aria-hidden="true" className="size-8 text-primary" />
@@ -66,7 +86,7 @@ function GroupShoppingList() {
 					<h3 className="text-lg font-semibold">Loading...</h3>
 				</Card>
 			)}
-			<AddButton to={`${base}/new-item`} label="Add an item" />
+			<AddButton label="Add an item" onClick={() => setEditor("new")} />
 		</section>
 	);
 }

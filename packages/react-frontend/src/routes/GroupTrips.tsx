@@ -1,10 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "react-router";
 import { ShoppingCart } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { errorMessage, itemsQuery, tripsQuery } from "@/lib/queries";
 import { cn, formatPrice } from "@/lib/utils";
 import AddButton from "@/components/AddButton";
+import InlineNameForm from "@/components/InlineNameForm";
+import { client } from "@/lib/client";
+import { parseResponse } from "hono/client";
+import { useState } from "react";
 import type { Trip } from "@grocery-split/validation";
 
 interface TripCardProps {
@@ -62,10 +66,31 @@ function TripCard({ groupId, trip }: TripCardProps) {
 function GroupTrips() {
 	const { groupId = "" } = useParams();
 	const { data: trips, error, isPending } = useQuery(tripsQuery(groupId));
+	const queryClient = useQueryClient();
+	const [adding, setAdding] = useState(false);
+	const create = useMutation({
+		mutationFn: (name: string) =>
+			parseResponse(
+				client.api.groups[":groupId"].trips.$post({ param: { groupId }, json: { name } })
+			),
+		onSuccess: () => {
+			void queryClient.invalidateQueries({ queryKey: tripsQuery(groupId).queryKey });
+			setAdding(false);
+		}
+	});
 
 	return (
 		<>
 			<section aria-label="Group trips" className="grid grid-cols-1 gap-3 sm:gap-4">
+				{adding && (
+					<InlineNameForm
+						placeholder="Trip name"
+						onCreate={create.mutate}
+						onCancel={() => setAdding(false)}
+						isPending={create.isPending}
+						error={create.error ? errorMessage(create.error) : undefined}
+					/>
+				)}
 				{isPending && <p className="text-sm text-muted-foreground">Loading trips…</p>}
 				{error && (
 					<p role="alert" className="text-sm text-destructive">
@@ -75,7 +100,7 @@ function GroupTrips() {
 				{trips?.map((trip) => (
 					<TripCard key={trip.id} groupId={groupId} trip={trip} />
 				))}
-				{trips?.length === 0 && (
+				{trips?.length === 0 && !adding && (
 					<Card className="items-center gap-3 rounded-2xl px-6 py-12 text-center shadow-sm">
 						<ShoppingCart aria-hidden="true" className="size-8 text-primary" />
 						<h2 className="font-heading text-lg font-semibold">No trips yet</h2>
@@ -85,7 +110,7 @@ function GroupTrips() {
 					</Card>
 				)}
 			</section>
-			<AddButton to={`/groups/${groupId}/new-trip`} label="Create a trip" />
+			<AddButton label="Create a trip" onClick={() => setAdding(true)} />
 		</>
 	);
 }

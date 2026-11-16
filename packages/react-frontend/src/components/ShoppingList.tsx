@@ -1,59 +1,83 @@
 import type { PopulatedItem } from "@grocery-split/validation";
-import { Link } from "react-router";
-import { AvatarGroup, UserAvatar } from "./ui/avatar";
+import { Fragment, type ReactNode } from "react";
+import { AvatarGroup, AvatarGroupCount, UserAvatar } from "./ui/avatar";
 import { formatPrice } from "@/lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
-import { Edit2 } from "lucide-react";
-import { Button } from "./ui/button";
+import InlineItemForm from "./InlineItemForm";
 
 function ShoppingList({
-	base,
+	groupId,
+	tripId,
 	items,
-	showPrice = true
+	showPrice = true,
+	createRow,
+	editingItemId,
+	onEdit
 }: {
-	base: string;
+	groupId: string;
+	tripId?: string;
 	items: PopulatedItem[];
 	showPrice?: boolean;
+	createRow?: ReactNode;
+	editingItemId?: string;
+	onEdit: (itemId: string) => void;
 }) {
 	return (
-		<Table>
+		<Table className="table-fixed text-xs sm:text-sm">
 			<TableHeader>
 				<TableRow className="text-sm">
 					<TableHead className="w-full">Name</TableHead>
-					<TableHead>Quantity</TableHead>
-					{showPrice && <TableHead className="text-right">Price</TableHead>}
-					<TableHead>Members</TableHead>
-					<TableHead>Edit</TableHead>
+					<TableHead className="w-20">Quantity</TableHead>
+					{showPrice && <TableHead className="w-20 text-right">Price</TableHead>}
+					<TableHead className="w-20">Members</TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>
+				{createRow}
 				{items.map((item) => (
-					<TableRow key={item.id}>
-						<TableCell className="w-full truncate text-base font-semibold">{item.name}</TableCell>
-						<TableCell className="truncate">{item.quantity}</TableCell>
-						{showPrice && (
-							<TableCell className="truncate">
-								{item.price ? formatPrice(item.price) : "-"}
+					<Fragment key={item.id}>
+						<TableRow
+							onClick={() => onEdit(item.id)}
+							onKeyDown={(event) => {
+								if (event.key === "Enter" || event.key === " ") {
+									event.preventDefault();
+									onEdit(item.id);
+								}
+							}}
+							role="button"
+							tabIndex={0}
+							aria-expanded={editingItemId === item.id}
+							aria-label={`Edit ${item.name}`}
+							className="cursor-pointer focus-within:bg-muted/50">
+							<TableCell className="w-full truncate text-base font-semibold">{item.name}</TableCell>
+							<TableCell className="w-20 truncate">{item.quantity}</TableCell>
+							{showPrice && (
+								<TableCell className="w-20 truncate text-right">
+									{item.price ? formatPrice(item.price) : "-"}
+								</TableCell>
+							)}
+							<TableCell className="w-20 overflow-hidden">
+								<AvatarGroup aria-label="Sharing this item" className="max-w-20">
+									{item.wantedBy.slice(0, 2).map((wantedItem) => (
+										<UserAvatar key={wantedItem.userId} user={wantedItem.user} size="sm" />
+									))}
+									{item.wantedBy.length > 2 && (
+										<AvatarGroupCount>+{item.wantedBy.length - 2}</AvatarGroupCount>
+									)}
+								</AvatarGroup>
 							</TableCell>
+						</TableRow>
+						{editingItemId === item.id && (
+							<InlineItemForm
+								key={`${item.id}-editor`}
+								groupId={groupId}
+								tripId={tripId}
+								showPrice={showPrice}
+								item={item}
+								onCancel={() => onEdit("")}
+							/>
 						)}
-						<TableCell>
-							<AvatarGroup aria-label="Sharing this item" className="flex-1">
-								{item.wantedBy.map((wantedItem) => (
-									<UserAvatar key={wantedItem.userId} user={wantedItem.user} size="sm" />
-								))}
-							</AvatarGroup>
-						</TableCell>
-						<TableCell>
-							<Button
-								variant="ghost"
-								size="icon"
-								aria-label={`Edit ${item.name}`}
-								nativeButton={false}
-								render={<Link to={`${base}/items/${item.id}/edit`} />}>
-								<Edit2 className="size-5" />
-							</Button>
-						</TableCell>
-					</TableRow>
+					</Fragment>
 				))}
 			</TableBody>
 		</Table>

@@ -49,7 +49,7 @@ function GroupTabs() {
 	}
 
 	return (
-		<main className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col gap-5 bg-background p-4 sm:gap-6 sm:p-6 lg:p-8">
+		<main className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col gap-4 bg-background p-3 sm:gap-6 sm:p-6 lg:p-8">
 			<header className="flex flex-col gap-4">
 				<div className="flex items-center gap-2 sm:gap-3">
 					<Button
@@ -101,7 +101,7 @@ function GroupTabs() {
 			{/* Bottom tabs, pinned to the bottom of the screen while scrolling */}
 			<nav
 				aria-label="Group sections"
-				className="sticky bottom-0 -mx-4 -mb-4 border-t bg-background px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:-mx-6 sm:-mb-6 sm:px-6 lg:-mx-8 lg:-mb-8 lg:px-8">
+				className="sticky bottom-0 -mx-3 -mb-3 border-t bg-background px-3 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:-mx-6 sm:-mb-6 sm:px-6 lg:-mx-8 lg:-mb-8 lg:px-8">
 				<div className="grid grid-cols-3 gap-1 rounded-2xl bg-secondary/60 p-1">
 					{tabs.map(({ label, path, icon: Icon }) => (
 						<NavLink
