@@ -123,8 +123,71 @@ pnpm run test
 ```
 ## 4. UI Tests
 
-TODO
+Browser tests using **Playwright** (Chromium). They open the real React app in a real browser, click and type like a user, and check what is shown on the page. They run against the **real API and a real local database** (the same seed data as the API tests), so nothing is mocked.
+
+### User stories covered
+
+**#16 - As a roommate, I want to create a household group so that I can manage grocery purchases with the people I live with.** (`e2e/groups.spec.ts`)
+- A signed out visitor who opens `/groups` is sent to the sign in page.
+- A signed in user only sees the groups they belong to.
+- A user creates a group, sees it in My Groups, and it is still there after a refresh (saved to the database).
+
+**#22 - As a roommate, I want to specify which roommates are sharing a grocery item so that people are only charged for items they use.** (`e2e/shopping-list.spec.ts`)
+- A user adds an item, picks a roommate to share it with, and sees it in the list (still there after a refresh).
+- A user tries to add an item that nobody is sharing, sees the error message, and the item is not saved.
+
+### How signing in works
+
+The app only supports Google sign in, which a test can't automate. Instead, the tests use a test-only API route, `POST /api/test/login` (`packages/api/src/routes/testing.ts`). It uses better-auth's `testUtils` plugin (the same one the API tests use for `getAuthHeaders`) to create a real session for a seeded user and returns its cookie, which the test gives to the browser (`signInAs` in `e2e/fixtures.ts`).
+
+The `testUtils` plugin is only loaded when `MODE=test`, so in dev and production this route always returns `404 Not Found`.
+
+### Test database and servers
+
+Playwright starts everything itself (`packages/react-frontend/playwright.config.ts`):
+1. `e2e/reset-db.ts` deletes and recreates the test database, then migrates and seeds it with the db package's seed script. The tests use their own database folder (`packages/api/.wrangler/e2e`), so your dev database is never touched.
+2. The API starts in test mode on `http://localhost:8788`.
+3. The frontend starts on `http://localhost:5174`, pointed at that API.
+
+Different ports from `pnpm dev` are used, so the tests can run while the dev servers are running. No `.env` values are needed for the tests.
+
+Setup (if you haven't already):
+```bash
+pnpm install
+cd packages/react-frontend
+pnpm exec playwright install chromium
+```
+
+Run tests:
+```bash
+cd packages/react-frontend
+pnpm run test          # headless
+pnpm run test:headed   # watch the browser click through the tests
+pnpm run test:ui       # step through each test in Playwright's UI
+```
+
+Example output:
+```
+Running 5 tests using 1 worker
+
+  ✓  1 [chromium] › e2e\groups.spec.ts:6:2 › my groups › sends a signed out visitor to the sign in page (1.9s)
+  ✓  2 [chromium] › e2e\groups.spec.ts:13:2 › my groups › shows a signed in user only the groups they belong to (819ms)
+  ✓  3 [chromium] › e2e\groups.spec.ts:24:2 › my groups › creates a group that is still there after a refresh (1.1s)
+  ✓  4 [chromium] › e2e\shopping-list.spec.ts:12:2 › group shopping list › adds an item shared with a roommate (1.3s)
+  ✓  5 [chromium] › e2e\shopping-list.spec.ts:36:2 › group shopping list › won't add an item that nobody is sharing (1.2s)
+
+  5 passed (33.1s)
+```
+
+## Running every test
+
+From the repo root, `pnpm test` runs the `test` script of every package (API tests, then browser tests).
+
+> This project uses **pnpm**. `npm test` won't work, because the root `package.json` requires pnpm through `devEngines`.
 
 ## Testing limitations and future
 
-TODO
+- **UI tests:** Google sign in itself isn't tested, since tests sign in through the test-only route.
+- **UI tests:** Only Chromium is tested. Firefox and WebKit could be added as extra Playwright projects.
+- **UI tests:** The tests share one database that is reset once per run, so they run one at a time and each test uses its own item and group names.
+- **Future UI tests:** joining a group with an invite code, creating a trip, and editing or deleting items.

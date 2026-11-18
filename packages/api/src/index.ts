@@ -2,6 +2,7 @@ import { auth } from "./lib/auth.ts";
 import { Hono, type Env } from "hono";
 import group from "./routes/groups.ts";
 import invites from "./routes/invites.ts";
+import testing from "./routes/testing.ts";
 import { HTTPException } from "hono/http-exception";
 import { useAuth } from "./middleware/auth.ts";
 import { cors } from "hono/cors";
@@ -32,6 +33,7 @@ const app = new Hono<AppEnv<false>>()
 	// routes
 	.route("/groups", group)
 	.route("/invites", invites)
+	.route("/test", testing) // Browser-test sign in, only active when MODE=test
 
 	// error handling
 	.notFound((c) => c.json({ message: "Not Found" }, 404))
