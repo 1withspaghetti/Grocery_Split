@@ -12,7 +12,7 @@ Roommates often need a better way to coordinate grocery purchases, plan shopping
 - Organize groceries into trips, with a shopping list for each trip.
 - Review group IOUs and see how grocery costs are split, including bulk items.
 
-These describe the product goals; the frontend and API are not yet connected.
+The frontend and API are connected for group, shopping-list, and trip features; balances are not yet available.
 
 ## Project Structure
 
@@ -61,7 +61,10 @@ Open the URL printed by Vite (usually [http://localhost:5173](http://localhost:5
 
 ## Tests
 
-Automated tests are not configured yet. No test command is currently available.
+Install dependencies with `pnpm install` and install the browser with
+`pnpm --filter @grocery-split/react-frontend exec playwright install chromium`.
+Run all tests from the repository root with `pnpm test`. See [TESTING.md](TESTING.md)
+for workspace commands, test data, and limitations.
 
 ## Contributing
 

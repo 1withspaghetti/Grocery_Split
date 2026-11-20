@@ -44,7 +44,7 @@ Then, I edited the DELETE /api/groups route to change the behavior
 -                       .returning();
  
 -               return c.json(firstOrNotFound(res, "Group Not Found") as Group);
-+               return c.body(null, 200);
++               return c.body(null, 204);
         })
 ```
 And the test passed.
@@ -105,11 +105,26 @@ Finally, all the tests passed.
 
 ## 2. Unit Tests
 
-TODO
+Unit tests exercise individual rules in isolation, without making API requests or using a database. Vitest runs these tests in `packages/api/test/validation.test.ts` against two shared validators. These rules protect item data and ensure a grocery item has a valid set of people sharing it.
+
+| Unit | Case | Expected result |
+| --- | --- | --- |
+| Item validator | Price is zero | Accepted |
+| Item validator | Price is negative | Rejected |
+| Item validator | Name is empty | Rejected |
+| Item-share validator | Two different users have shares | Accepted |
+| Item-share validator | No users have shares | Rejected |
+| Item-share validator | A user has two share entries | Rejected |
+
+Run the unit tests with:
+
+```bash
+pnpm --filter @grocery-split/api exec vitest run test/validation.test.ts
+```
 
 ## 3. System Tests
 
-Testing all the api routes using **vitest** and **cloudflare’s vitest plugin**.
+System tests use **Vitest** and **Cloudflare's Vitest plugin** to exercise API routes, authentication, and the database together, such as creating and retrieving a group or rejecting a deletion by a non-owner.
 
 Setup (if you haven't already):
 ```bash
@@ -181,9 +196,7 @@ Running 5 tests using 1 worker
 
 ## Running every test
 
-From the repo root, `pnpm test` runs the `test` script of every package (API tests, then browser tests).
-
-> This project uses **pnpm**. `npm test` won't work, because the root `package.json` requires pnpm through `devEngines`.
+From the repo root, `npm test` or `pnpm test` runs the `test` script of every package (API tests, then browser tests). Both commands require pnpm to be installed and available on your PATH.
 
 ## Testing limitations and future
 
