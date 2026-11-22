@@ -83,3 +83,33 @@ export const validateGroupAndItemParam = createMiddleware<
 
 	await next();
 });
+
+export const validateGroupAndTransactionParam = createMiddleware<
+	AppEnv<true> & { Variables: { groupId: string; transactionId: string } },
+	":groupId/:transactionId"
+>(async (c, next) => {
+	const { user } = c.var.session;
+
+	const { success, data, error } = await validator.groupTransactionParams.safeParseAsync(
+		c.req.param()
+	);
+	if (!success) throw new HTTPException(400, { message: error.issues[0].message });
+
+	const [exists] = await db
+		.select({ count: count() })
+		.from(schema.membership)
+		.innerJoin(schema.transaction, eq(schema.membership.groupId, schema.transaction.groupId))
+		.where(
+			and(
+				eq(schema.membership.userId, user.id),
+				eq(schema.membership.groupId, data.groupId),
+				eq(schema.transaction.id, data.transactionId)
+			)
+		);
+	if (!exists || exists.count == 0) throw new HTTPException(404, { message: "Not Found" });
+
+	c.set("groupId", data.groupId);
+	c.set("transactionId", data.transactionId);
+
+	await next();
+});

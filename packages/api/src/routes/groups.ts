@@ -12,6 +12,7 @@ import { validateGroupParam } from "../middleware/validateParams.ts";
 import trips from "./trips.ts";
 import items from "./items.ts";
 import { firstOrNotFound } from "../lib/firstOrNotFound.ts";
+import transactions from "./transactions.ts";
 
 const group = new Hono<AppEnv<true>>()
 	.use(enforceAuth)
@@ -137,6 +138,7 @@ const group = new Hono<AppEnv<true>>()
 
 	// Handle all trip requests related to this group
 	.route("/:groupId/trips", trips)
-	.route("/:groupId/items", items);
+	.route("/:groupId/items", items)
+	.route("/:groupId/transactions", transactions);
 
 export default group;

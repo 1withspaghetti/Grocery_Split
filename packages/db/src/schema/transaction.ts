@@ -10,6 +10,7 @@ export const transaction = snakeCase.table(
 		groupId: text()
 			.notNull()
 			.references(() => group.id, { onDelete: "cascade" }),
+		note: text(),
 		amount: real().notNull(),
 		fromId: text()
 			.notNull()

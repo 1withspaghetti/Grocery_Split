@@ -15,6 +15,11 @@ export const groupItemParams = z.object({
 	itemId: idValidator
 });
 
+export const groupTransactionParams = z.object({
+	groupId: idValidator,
+	transactionId: idValidator
+});
+
 export const inviteParams = z.object({
 	code: z.string().regex(/^[0-9a-zA-Z]{1,16}$/, "Invalid Invite Code")
 });
@@ -32,3 +37,8 @@ export const itemSort = z.object({
 export type ItemSort = z.infer<typeof itemSort>;
 
 export const itemListQuery = tripQuery.extend(itemSort.shape);
+
+export const transactionSort = z.object({
+	sort: z.enum(["createdAt", "amount"]).default("createdAt"),
+	order: z.enum(["asc", "desc"]).default("asc")
+});
