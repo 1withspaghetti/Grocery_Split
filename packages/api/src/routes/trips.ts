@@ -3,12 +3,24 @@ import type { AppEnv } from "../index.ts";
 import { validateGroupAndTripParam, validateGroupParam } from "../middleware/validateParams.ts";
 import { db } from "../lib/db.ts";
 import { schema } from "@grocery-split/db";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import { validator, type Trip } from "@grocery-split/validation";
 import { zValidator } from "../middleware/zValidator.ts";
 import { nanoid } from "../lib/nanoid.ts";
 import { firstOrNotFound } from "../lib/firstOrNotFound.ts";
+
+// Whoever paid for a trip has to be a member of its group
+async function validatePaidById(groupId: string, userId: string | null | undefined) {
+	if (userId === null || userId === undefined) return;
+
+	const [member] = await db
+		.select({ id: schema.membership.userId })
+		.from(schema.membership)
+		.where(and(eq(schema.membership.userId, userId), eq(schema.membership.groupId, groupId)));
+
+	if (!member) throw new HTTPException(404, { message: "User Not Found" });
+}
 
 // Is a route defined in ./groups.ts so auth is already enforced
 const trips = new Hono<AppEnv<true>>()
@@ -36,6 +48,8 @@ const trips = new Hono<AppEnv<true>>()
 		const { user } = c.var.session;
 		const data = c.req.valid("json");
 
+		await validatePaidById(c.var.groupId, data.paidById);
+
 		const res = await db
 			.insert(schema.trip)
 			.values({
@@ -53,6 +67,8 @@ const trips = new Hono<AppEnv<true>>()
 	// Updating trip
 	.patch("/:tripId", validateGroupAndTripParam, zValidator("json", validator.trip), async (c) => {
 		const data = c.req.valid("json");
+
+		await validatePaidById(c.var.groupId, data.paidById);
 
 		// Update the actual trip
 		const res = await db

@@ -5,6 +5,7 @@ import type { User } from "./user.ts";
 export interface Trip {
 	id: ID;
 	name: string;
+	paidById: User["id"] | null;
 	groupId: Group["id"];
 	createdAt: number;
 	createdById: User["id"];

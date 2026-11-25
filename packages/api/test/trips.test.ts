@@ -339,6 +339,59 @@ describe("trips routes", () => {
 		});
 	});
 
+	it("fails to set who paid for a trip to someone outside the group", async () => {
+		const headers = await authTestHelper.getAuthHeaders({ userId: "user000000000001" });
+		const body = {
+			name: "Test Trip edited",
+			paidById: "user999999999999"
+		};
+		const res = await api.patch(`/api/groups/group00000000001/trips/${createdTripId}`, body, {
+			headers
+		});
+		expect(res.status).toBe(404);
+		expect(await res.json()).toStrictEqual({ message: "User Not Found" });
+	});
+
+	it("sets who paid for a trip", async () => {
+		const headers = await authTestHelper.getAuthHeaders({ userId: "user000000000001" });
+		const body = {
+			name: "Test Trip edited",
+			paidById: "user000000000002"
+		};
+		const res = await api.patch(`/api/groups/group00000000001/trips/${createdTripId}`, body, {
+			headers
+		});
+		expect(res.status).toBe(200);
+		expect(await res.json()).toStrictEqual({
+			id: createdTripId,
+			groupId: "group00000000001",
+			name: "Test Trip edited",
+			paidById: "user000000000002",
+			createdById: "user000000000001",
+			createdAt: createdTripAt
+		});
+	});
+
+	it("clears who paid for a trip", async () => {
+		const headers = await authTestHelper.getAuthHeaders({ userId: "user000000000001" });
+		const body = {
+			name: "Test Trip edited",
+			paidById: null
+		};
+		const res = await api.patch(`/api/groups/group00000000001/trips/${createdTripId}`, body, {
+			headers
+		});
+		expect(res.status).toBe(200);
+		expect(await res.json()).toStrictEqual({
+			id: createdTripId,
+			groupId: "group00000000001",
+			name: "Test Trip edited",
+			paidById: null,
+			createdById: "user000000000001",
+			createdAt: createdTripAt
+		});
+	});
+
 	// DELETE /api/groups/:id/trips/:id
 
 	it("fails to delete trip for an invalid trip id", async () => {

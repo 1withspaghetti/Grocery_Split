@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import ShoppingList from "@/components/ShoppingList";
 import InlineItemForm from "@/components/InlineItemForm";
 import ItemSortSelect from "@/components/ItemSortSelect";
+import TripPaidBySelect from "@/components/TripPaidBySelect";
 import { itemsQuery } from "@/lib/queries";
 import { validator, type ItemSort } from "@grocery-split/validation";
 
@@ -43,6 +44,7 @@ function GroupShoppingList() {
 		<section
 			aria-label={tripId ? "Trip items" : "Group shopping list"}
 			className="flex flex-1 flex-col gap-4">
+			{tripId && <TripPaidBySelect groupId={groupId!} tripId={tripId} />}
 			{!(items.isSuccess && items.data.length === 0) && (
 				<ItemSortSelect value={sort} onChange={setSort} showPrice={showPrice} />
 			)}
