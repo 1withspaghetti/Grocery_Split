@@ -61,6 +61,15 @@ export const itemSharesQuery = (groupId: string, itemId: string) =>
 		queryFn: () => parseResponse(group.items[":itemId"].shares.$get({ param: { groupId, itemId } }))
 	});
 
+export const transactionsQuery = (groupId: string) =>
+	queryOptions({
+		queryKey: ["groups", groupId, "transactions"],
+		queryFn: () =>
+			parseResponse(
+				group.transactions.$get({ param: { groupId }, query: validator.transactionSort.parse({}) })
+			)
+	});
+
 // The API sends { message } with its errors, use that when it's there
 export function errorMessage(error: Error) {
 	if (error instanceof DetailedError) {
